@@ -3,16 +3,13 @@ import matplotlib.pyplot as plt
 
 class Plotter:
     def plot_model_function(
-            self,
-            freq: list[float],
-            signal: list[float],
-            signal_noise: list[float]
-            ) -> None: 
+        self, freq: list[float], signal: list[float], signal_noise: list[float]
+    ) -> None:
         """
         Plots the model function and the signal with white
         gaussian noise (WGN).
 
-        :param freq: list with frequencies 
+        :param freq: list with frequencies
         :type freq: list[float]
         :param signal: list with the signal
         :type signal: list[float]

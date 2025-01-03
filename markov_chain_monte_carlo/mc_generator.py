@@ -3,15 +3,15 @@ import numpy as np
 
 
 class MCGenerator:
-    def __init__(self, model: Callable[...,Any]):
+    def __init__(self, model: Callable[..., Any]):
         self._model = model
-        
+
     def model(
-            amp: float,
-            v_0: float,
-            alpha: float,
-            v_i: float,
-            ) -> float:
+        amp: float,
+        v_0: float,
+        alpha: float,
+        v_i: float,
+    ) -> float:
         """
         Defines the model that is used to generate the data.
 
@@ -29,16 +29,13 @@ class MCGenerator:
         :return: the datapoint at nu
         :rtype: float
         """
-        frac = v_i/v_0
-        x_val = amp * frac ** alpha * (1 + frac) ** (-4 * alpha)
+        frac = v_i / v_0
+        x_val = amp * frac**alpha * (1 + frac) ** (-4 * alpha)
         return x_val
 
     def run_monte_carlo(
-            model: Callable[...,Any],
-            num: int = 1e5,
-            nu_range: list = (0, 1),
-            **kwargs
-            ) -> np.ndarray:
+        model: Callable[..., Any], num: int = 1e5, nu_range: list = (0, 1), **kwargs
+    ) -> np.ndarray:
         """
         Generates Monte Carlo realizations of x by adding
         different realizations of noise comming from

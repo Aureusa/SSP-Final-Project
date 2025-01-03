@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-def get_data() -> tuple[list[float],list[float],list[float]]:
+def get_data() -> tuple[list[float], list[float], list[float]]:
     """
     Gets the data from the csv file.
 

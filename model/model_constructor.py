@@ -1,27 +1,36 @@
 from typing import Callable, Any
 import jax.numpy as jnp
 
+
 class ModelConstructor:
-    def get_model(self) -> Callable[...,Any]:
+    def get_log_likelihood(self) -> Callable[..., Any]:
         """
         Gets the functon for the model.
 
         :return: the log likelihood model.
         :rtype: Callable[...,Any]
         """
-        return self._model
-    
-    def _model(
-            self,
-            A: float,
-            v_0: float,
-            alpha: float,
-            v_i: float,
-            s_n: list[float],
-            sigma: float = jnp.sqrt(0.0025)
-            ) -> float:
+        return self._log_likelihood
+
+    def get_generative_model(self) -> Callable[..., Any]:
+        return self._generative_model
+
+    def _generative_model(self, v_i, A, v_0, alpha):
+        frac = v_i / v_0
+        y_val = A * frac**alpha * (1 + frac) ** (-4 * alpha)
+        return y_val
+
+    def _log_likelihood(
+        self,
+        A: float,
+        v_0: float,
+        alpha: float,
+        v_i: float,
+        s_n: list[float],
+        sigma: float = jnp.sqrt(0.0025),
+    ) -> float:
         """
-        Defines the model used to generate data and calculates the negative log-likelihood 
+        Defines the model used to generate data and calculates the negative log-likelihood
         based on observed data and the model.
 
         :param A: Amplitude of the model.
@@ -39,5 +48,5 @@ class ModelConstructor:
         :return: Negative log-likelihood of the model given the observed data.
         :rtype: float
         """
-        model = A * (v_i/v_0) ** alpha * (1 + v_i/v_0) ** (-4 * alpha)
+        model = A * (v_i / v_0) ** alpha * (1 + v_i / v_0) ** (-4 * alpha)
         return jnp.sum(-0.5 * (s_n - model) ** 2 / sigma**2)
