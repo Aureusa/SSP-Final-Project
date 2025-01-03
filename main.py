@@ -1,5 +1,5 @@
-from estimator import MLEGeneralJAX
-from model_constructor import ModelConstructor
+from estimator.estimator import MLEGeneralJAX
+from model.model_constructor import ModelConstructor
 from utils import get_data
 import jax.numpy as jnp
 

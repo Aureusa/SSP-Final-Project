@@ -11,7 +11,9 @@ def get_data() -> tuple[list[float],list[float],list[float]]:
     (frequency, signal, signal+noise)
     :rtype: tuple[list[float],list[float],list[float]]
     """
-    data = pd.read_csv(os.getcwd() + "\\project_data.csv")
+    data_dir = os.path.join(os.getcwd(), "data")
+    filename = os.path.join(data_dir, "project_data.csv")
+    data = pd.read_csv(filename)
     freq = data["freq"]
     signal = data["Signal"]
     signal_noise = data["Signal+Noise"]
