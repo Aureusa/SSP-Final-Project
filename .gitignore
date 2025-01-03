@@ -1,0 +1,13 @@
+# Ignore environment files
+.env
+
+# Ignore __pycache__ dirs
+__pycache__/
+
+# Python specific
+*.pyc
+*.pyo
+.pytest_cache/
+
+# VS code
+.vscode/
