@@ -5,6 +5,7 @@ import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+from copy import deepcopy
 
 
 class MLEGeneralJAX:
@@ -22,7 +23,7 @@ class MLEGeneralJAX:
         model: Callable[..., Any],
         log_likelihood: Callable[..., Any],
         nuisance_params: list[str],
-        data: tuple[list],
+        data: tuple[list]|None,
         gamma: float,
     ) -> None:
         """
@@ -48,6 +49,24 @@ class MLEGeneralJAX:
         self._gradient_norms: list[float] = []
         self._estimates: list[float] = []
         self._params_to_estimate: list[str] | None = None
+
+    @property
+    def estimates(self):
+        return deepcopy(self._estimates)
+    
+    @property
+    def gradient_norms(self):
+        return deepcopy(self._gradient_norms)
+    
+    @property
+    def data(self):
+        return self._data
+    
+    @data.setter
+    def data(self, data):
+        self._gradient_norms = []
+        self._estimates = []
+        self._data = data
 
     def evaluate_the_ML_estimate(
         self, guess: list[float], data_logging: bool, treshhold: float
