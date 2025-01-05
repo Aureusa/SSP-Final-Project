@@ -229,7 +229,7 @@ class MLEGeneralJAX:
 
         plt.title(title)
         plt.xlabel(x_labels)
-        plt.ylabel("Residuals Values")
+        plt.ylabel("Frequency")
         plt.grid(axis="y", linestyle="--", alpha=0.7)
         plt.legend()
         plt.show()
