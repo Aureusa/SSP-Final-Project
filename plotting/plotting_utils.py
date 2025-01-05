@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import jax.numpy as jnp
-from scipy.stats import norm, poisson
+from scipy.stats import norm
 
 
 class Plotter:
@@ -23,7 +23,9 @@ class Plotter:
         _, ax = plt.subplots()
 
         ax.plot(freq, signal, label="Signal", color="blue")
-        ax.scatter(freq, signal_noise, label="Signal + WGN", color="black", marker="*")
+        ax.scatter(
+            freq, signal_noise, label="Signal + WGN", color="black", marker="*"
+        )
 
         ax.set_xlabel("frequency (ν)")
         ax.set_ylabel("Amplitude")
@@ -32,11 +34,11 @@ class Plotter:
         plt.show()
 
     def plot_mc_realizations(
-            self,
-            nu: jnp.ndarray,
-            signal: jnp.ndarray,
-            realizations: np.ndarray,
-            num_realizations: int = 5
+        self,
+        nu: jnp.ndarray,
+        signal: jnp.ndarray,
+        realizations: np.ndarray,
+        num_realizations: int = 5,
     ) -> None:
         """
         Makes a 3D plot of the realizations of the signal
@@ -53,19 +55,25 @@ class Plotter:
         :type num_realizations: int, optional
         """
         fig = plt.figure(figsize=(10, 6))
-        ax = fig.add_subplot(111, projection='3d')
-        print(num_realizations)
+        ax = fig.add_subplot(111, projection="3d")
+
         # Plot each realization with a y-offset
         for i in range(num_realizations):
             y = np.full_like(signal, i)  # y-axis offset for spacing
-            z = realizations[i]          # z-axis: signal + noise values
-            
+            z = realizations[i]  # z-axis: signal + noise values
+
             ax.scatter(nu, y, z, label=f"Realization {i+1}", s=50)
-        
+
         # Plot the signal as first
         y_signal = -1
-        ax.plot(nu, np.full_like(signal, y_signal), signal, 
-                color="black", linewidth=2, label="Original Signal")
+        ax.plot(
+            nu,
+            np.full_like(signal, y_signal),
+            signal,
+            color="black",
+            linewidth=2,
+            label="Original Signal",
+        )
 
         ax.set_title(
             f"3D Plot of Signal with Noise (First {num_realizations} Realizations)"
@@ -78,14 +86,23 @@ class Plotter:
 
         plt.show()
 
-    def plot_estimated_parameter(self, data: np.ndarray, title: str, x_labels: str):
+    def plot_estimated_parameter(
+        self, data: np.ndarray, title: str, x_labels: str
+    ):
         mean = data.mean()
         std = data.std()
 
         self._plot_hist(data, title, x_labels, mean, std)
 
+        return mean, std
+
     def _plot_hist(
-        self, data: np.ndarray, title: str, x_labels: str, mean: float, std: float
+        self,
+        data: np.ndarray,
+        title: str,
+        x_labels: str,
+        mean: float,
+        std: float,
     ) -> None:
         """
         Plots a histogram of the data.
@@ -151,39 +168,56 @@ class Plotter:
 
     def plot_estimates_with_variance(self, estimates: np.ndarray):
         """
-        Plots the mean and variance (as a shaded area) of the estimates
-        from a list of lists of lists.
+        Plots the mean and variance (as a shaded area) of the estimates.
         """
         # Calculate the mean and standard deviation across runs (axis=0)
-        mean_estimates = np.mean(estimates, axis=0)  # Shape: (steps, num_params)
-        std_estimates = np.std(estimates, axis=0)    # Shape: (steps, num_params)
+        mean_estimates = np.mean(
+            estimates, axis=0
+        )  # Shape: (steps, num_params)
+        std_estimates = np.std(estimates, axis=0)  # Shape: (steps, num_params)
 
         # Extract mean and std for each parameter
         mean_A, mean_v_0, mean_alpha = mean_estimates.T
         std_A, std_v_0, std_alpha = std_estimates.T
 
-        iterations = np.arange(len(mean_A))  # x-axis for plotting
+        # Get the number of steps
+        steps = np.arange(len(mean_A))
 
         # Plotting
         plt.figure(figsize=(10, 8))
-        
+
         # A
-        plt.plot(iterations, mean_A, label="Mean A", color="blue")
-        plt.fill_between(iterations, mean_A - std_A, mean_A + std_A, color="blue", alpha=0.2)
-        
+        plt.plot(steps, mean_A, label="Mean A", color="blue")
+        plt.fill_between(
+            steps, mean_A - std_A, mean_A + std_A, color="blue", alpha=0.2
+        )
+
         # v_0
-        plt.plot(iterations, mean_v_0, label="Mean v_0", color="green")
-        plt.fill_between(iterations, mean_v_0 - std_v_0, mean_v_0 + std_v_0, color="green", alpha=0.2)
-        
+        plt.plot(steps, mean_v_0, label="Mean v_0", color="green")
+        plt.fill_between(
+            steps,
+            mean_v_0 - std_v_0,
+            mean_v_0 + std_v_0,
+            color="green",
+            alpha=0.2,
+        )
+
         # alpha
-        plt.plot(iterations, mean_alpha, label="Mean alpha", color="red")
-        plt.fill_between(iterations, mean_alpha - std_alpha, mean_alpha + std_alpha, color="red", alpha=0.2)
-        
+        plt.plot(steps, mean_alpha, label="Mean alpha", color="red")
+        plt.fill_between(
+            steps,
+            mean_alpha - std_alpha,
+            mean_alpha + std_alpha,
+            color="red",
+            alpha=0.2,
+        )
+
         # Labels and legend
         plt.xlabel("Step")
         plt.ylabel("Value")
-        plt.title("Mean and Variance of Parameter Estimates\n duiring the Newton-Raphson optimization")
+        plt.title(
+            "Mean and Variance of Parameter Estimates\n duiring the Newton-Raphson optimization"
+        )
         plt.grid(True)
         plt.legend()
         plt.show()
-

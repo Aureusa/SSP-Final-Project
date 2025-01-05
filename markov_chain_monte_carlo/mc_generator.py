@@ -11,9 +11,7 @@ class MCGenerator:
         """
         self._signal = np.array(signal)
 
-    def generate_mc_realizations(
-        self, num: int = 1e4
-    ) -> np.ndarray:
+    def generate_mc_realizations(self, num: int = 1e4) -> np.ndarray:
         """
         Generates Monte Carlo realizations of x by adding
         different realizations of noise comming from
@@ -26,5 +24,7 @@ class MCGenerator:
         :return: an array of the generated realizations of x
         :rtype: list[float]
         """
-        noise = np.random.normal(loc=0, scale=0.5, size=(int(num), len(self._signal)))
+        noise = np.random.normal(
+            loc=0, scale=0.5, size=(int(num), len(self._signal))
+        )
         return self._signal + noise

@@ -23,7 +23,7 @@ class MLEGeneralJAX:
         model: Callable[..., Any],
         log_likelihood: Callable[..., Any],
         nuisance_params: list[str],
-        data: tuple[list]|None,
+        data: tuple[list] | None,
         gamma: float,
     ) -> None:
         """
@@ -53,15 +53,15 @@ class MLEGeneralJAX:
     @property
     def estimates(self):
         return deepcopy(self._estimates)
-    
+
     @property
     def gradient_norms(self):
         return deepcopy(self._gradient_norms)
-    
+
     @property
     def data(self):
         return self._data
-    
+
     @data.setter
     def data(self, data):
         self._gradient_norms = []
@@ -185,7 +185,12 @@ class MLEGeneralJAX:
         return mean, std
 
     def _plot_hist(
-        self, data: np.ndarray, title: str, x_labels: str, mean: float, std: float
+        self,
+        data: np.ndarray,
+        title: str,
+        x_labels: str,
+        mean: float,
+        std: float,
     ) -> None:
         """
         Plots a histogram of the data.
@@ -249,7 +254,9 @@ class MLEGeneralJAX:
         k = round(n ** (1 / 3))
         return int(k)
 
-    def _analyse_residuals(self, residuals: jnp.ndarray) -> tuple[float, float]:
+    def _analyse_residuals(
+        self, residuals: jnp.ndarray
+    ) -> tuple[float, float]:
         """
         Analyses the distribution of the residuals. Assumes it is gaussian
         and prints the mean and the standart devation, after which it
@@ -267,7 +274,9 @@ class MLEGeneralJAX:
         mean = round(mean, 2)
         std = round(std, 2)
 
-        print(f"The mean of the residuals is (rounded to two decimals): {mean:.2f}")
+        print(
+            f"The mean of the residuals is (rounded to two decimals): {mean:.2f}"
+        )
         print(
             f"The standard deviation of the residuals is (rounded to two decimals): {std:.2f}"
         )
@@ -305,7 +314,9 @@ class MLEGeneralJAX:
         self._estimates.append(guess_arr.tolist())
         self._gradient_norms.append(grad_norm)
 
-    def _compute_gradient_vector_and_jacobian(self, vals: jnp.ndarray) -> jnp.ndarray:
+    def _compute_gradient_vector_and_jacobian(
+        self, vals: jnp.ndarray
+    ) -> jnp.ndarray:
         """
         Computes the gradient vector and multiplies it with the jacobian matrix
         (the Hessian).
