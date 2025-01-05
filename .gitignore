@@ -11,3 +11,6 @@ __pycache__/
 
 # VS code
 .vscode/
+
+# pyproject.toml
+pyproject.toml
