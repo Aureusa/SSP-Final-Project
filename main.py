@@ -1,5 +1,6 @@
 from utils import get_data
 import jax.numpy as jnp
+import numpy as np
 
 from plotting.plotting_utils import Plotter
 from estimator.estimator import MLEGeneralJAX
@@ -101,5 +102,75 @@ def ex_3(
     print_mc_results(mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha)
 
 
+def ex_5():
+    from bayesian.bayes import BayesianAnalysis
+
+    likelihood = ModelConstructor().get_not_normalized_log_likelihood()
+
+    A = np.linspace(0.880, 17.5, 100)
+    v0 = np.linspace(0.330, 1.485, 100)
+    alpha = np.linspace(0.20, 1.450, 100)
+
+    analysist = BayesianAnalysis(nu, s_n)
+
+    (
+        marginalized_A_v0,  # P(A,νo)
+        marginalized_A_alpha,  # P(A,α)
+        marginalized_v0_alpha,  # P(νo,α)
+        marginalized_A,  # P(A)
+        marginalized_v0,  # P(νo)
+        marginalized_alpha,  # P(α)
+    ) = analysist.compute_pdfs(likelihood, A, v0, alpha)
+
+    plotter = Plotter()
+
+    plotter.contour_plot(
+        A,
+        v0,
+        marginalized_A_v0,
+        "Amplitude (A)",
+        "v0",
+        "Marginalized (over alpha) Likelihood P(A,νo)",
+    )
+
+    plotter.contour_plot(
+        A,
+        alpha,
+        marginalized_A_alpha,
+        "Amplitude (A)",
+        "alpha",
+        "Marginalized (over v0) Likelihood P(A,α)",
+    )
+
+    plotter.contour_plot(
+        v0,
+        alpha,
+        marginalized_v0_alpha,
+        "v0",
+        "alpha",
+        "Marginalized (over A) Likelihood P(νo,α)",
+    )
+
+    plotter.marginalized_pdf(
+        A,
+        marginalized_A,
+        "Amplitude (A)",
+        "Marginalized PDF of the amplitude A\n P(A)",
+        "P(A)",
+    )
+
+    plotter.marginalized_pdf(
+        v0, marginalized_v0, "v0", "Marginalized PDF of v0\n P(νo)", "P(νo)"
+    )
+
+    plotter.marginalized_pdf(
+        alpha,
+        marginalized_alpha,
+        "alpha",
+        "Marginalized PDF of alpha\n P(α)",
+        "P(α)",
+    )
+
+
 if __name__ == "__main__":
-    ...
+    ex_5()

@@ -221,3 +221,77 @@ class Plotter:
         plt.grid(True)
         plt.legend()
         plt.show()
+
+    def contour_plot(
+        self,
+        data1: np.ndarray,
+        data2: np.ndarray,
+        marginalized_data1_data2: np.ndarray,
+        xlabel: str,
+        ylabel: str,
+        title: str,
+    ):
+        """
+        Creates and displays a contour plot of the marginalized likelihood values
+        for two variables (data1 and data2). This method generates a filled contour
+        plot that visualizes the joint probability distribution of the variables.
+
+        :param data1: 1D array of data for the first variable (e.g., A values).
+        :type data1: np.ndarray
+        :param data2: 1D array of data for the second variable (e.g., v0 values).
+        :type data2: np.ndarray
+        :param marginalized_data1_data2: 2D array of marginalized likelihood values
+        for the pair of variables.
+        :type marginalized_data1_data2: np.ndarray
+        :param xlabel: Label for the x-axis, usually the name of the first variable.
+        :type xlabel: str
+        :param ylabel: Label for the y-axis, usually the name of the second variable.
+        :type ylabel: str
+        :param title: Title for the contour plot.
+        :type title: str
+        """
+        plt.figure()
+        plt.contourf(
+            data1, data2, marginalized_data1_data2.T, 20, cmap='viridis'
+        )
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
+        plt.colorbar(label="Likelihood")
+        plt.show()
+
+    def marginalized_pdf(
+        self,
+        data1: np.ndarray,
+        marginalized_data1: np.ndarray,
+        xlabel: str,
+        title: str,
+        label: str,
+    ):
+        """
+        Creates and displays a plot for the marginalized probability density function (PDF)
+        of a single variable (data1). This method plots the likelihood values marginalized
+        over other variables.
+
+        :param data1: 1D array of the data for the variable to be plotted
+        (e.g., A values).
+        :type data1: np.ndarray
+        :param marginalized_data1: 1D array of the marginalized likelihood
+        values for the variable.
+        :type marginalized_data1: np.ndarray
+        :param xlabel: Label for the x-axis, usually the name of the variable
+        (e.g., "A").
+        :type xlabel: str
+        :param title: Title for the marginalized PDF plot.
+        :type title: str
+        :param label: Label for the plot line
+        (typically the name of the variable).
+        :type label: str
+        """
+        plt.figure()
+        plt.plot(data1, marginalized_data1, label=label, color='b')
+        plt.xlabel(xlabel)
+        plt.ylabel("PDF")
+        plt.title(title)
+        plt.legend()
+        plt.show()
