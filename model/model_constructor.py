@@ -1,8 +1,71 @@
 from typing import Callable, Any
 import jax.numpy as jnp
+import numpy as np
 
 
 class ModelConstructor:
+    """
+    A class for constructing models, including likelihood functions,
+    generative models, and multivariate Gaussian sampling.
+    """
+
+    def get_multivariate_gaussian(self) -> Callable[..., Any]:
+        """
+        Gets the multivariate Gaussian sampling function.
+
+        :return: The multivariate Gaussian function.
+        :rtype: Callable[...,Any]
+        """
+        return self._multivariate_gaussian
+
+    def get_likelihood(self) -> Callable[..., Any]:
+        """
+        Gets the likelihood function.
+
+        :return: The likelihood function.
+        :rtype: Callable[...,Any]
+        """
+
+        return self._likelihood
+
+    def _likelihood(
+        self, parameters: np.ndarray, data: tuple[np.ndarray, np.ndarray]
+    ) -> float:
+        """
+        Computes the likelihood for the given parameters and data.
+
+        :param parameters: Model parameters (A, v_0, alpha).
+        :type parameters: np.ndarray
+        :param data: Tuple containing `v_i` (velocity data) and `s_n` (signal data).
+        :type data: tuple[np.ndarray, np.ndarray]
+        :return: The likelihood value.
+        :rtype: float
+        """
+        v_i, s_n = data
+
+        A = parameters[0]
+        v_0 = parameters[1]
+        alpha = parameters[2]
+
+        model = A * (v_i / v_0) ** alpha * (1 + v_i / v_0) ** (-4 * alpha)
+        return np.exp(np.sum(-((s_n - model) ** 2)))
+
+    def _multivariate_gaussian(
+        self, mean: np.ndarray, covariance_matrix: np.ndarray
+    ) -> np.ndarray:
+        """
+        Generates a sample from a multivariate Gaussian distribution.
+
+        :param mean: Mean of the Gaussian distribution.
+        :type mean: np.ndarray
+        :param covariance_matrix: Covariance matrix of the
+        Gaussian distribution.
+        :type covariance_matrix: np.ndarray
+        :return: A sample from the Gaussian distribution.
+        :rtype: np.ndarray
+        """
+        return np.random.multivariate_normal(mean, covariance_matrix, 1)
+
     def get_log_likelihood(self) -> Callable[..., Any]:
         """
         Gets the functon for the model.
@@ -22,9 +85,31 @@ class ModelConstructor:
         return self._not_normalized_log_likelihood
 
     def get_generative_model(self) -> Callable[..., Any]:
+        """
+        Gets the generative model function.
+
+        :return: The generative model function.
+        :rtype: Callable[..., Any]
+        """
         return self._generative_model
 
-    def _generative_model(self, v_i, A, v_0, alpha):
+    def _generative_model(
+        self, v_i: np.ndarray, A: float, v_0: float, alpha: float
+    ) -> np.ndarray:
+        """
+        Computes the generative model output for given inputs.
+
+        :param v_i: Input velocity values.
+        :type v_i: np.ndarray
+        :param A: Amplitude parameter.
+        :type A: float
+        :param v_0: Scale parameter.
+        :type v_0: float
+        :param alpha: Shape parameter.
+        :type alpha: float
+        :return: The generative model output.
+        :rtype: np.ndarray
+        """
         frac = v_i / v_0
         y_val = A * frac**alpha * (1 + frac) ** (-4 * alpha)
         return y_val
