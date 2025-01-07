@@ -87,14 +87,31 @@ class Plotter:
         plt.show()
 
     def plot_estimated_parameter(
-        self, data: np.ndarray, title: str, x_labels: str
+        self,
+        data: np.ndarray,
+        title: str,
+        x_labels: str,
+        mean: float,
+        std: float,
     ):
-        mean = data.mean()
-        std = data.std()
+        """
+        Plots a histogram of the estimated parameter and
+        overlays the mean and standard deviation.
 
+        :param data: The data to be plotted as a histogram.
+        :type data: np.ndarray
+        :param title: The title of the plot.
+        :type title: str
+        :param x_labels: The label for the x-axis.
+        :type x_labels: str
+        :param mean: The mean value of the parameter to
+        be overlaid on the plot.
+        :type mean: float
+        :param std: The standard deviation of the parameter
+        to be overlaid on the plot.
+        :type std: float
+        """
         self._plot_hist(data, title, x_labels, mean, std)
-
-        return mean, std
 
     def _plot_hist(
         self,
@@ -216,7 +233,8 @@ class Plotter:
         plt.xlabel("Step")
         plt.ylabel("Value")
         plt.title(
-            "Mean and Variance of Parameter Estimates\n duiring the Newton-Raphson optimization"
+            "Mean and Variance of Parameter Estimates\n "
+            "duiring the Newton-Raphson optimization"
         )
         plt.grid(True)
         plt.legend()
@@ -232,20 +250,25 @@ class Plotter:
         title: str,
     ):
         """
-        Creates and displays a contour plot of the marginalized likelihood values
-        for two variables (data1 and data2). This method generates a filled contour
-        plot that visualizes the joint probability distribution of the variables.
+        Creates and displays a contour plot of the marginalized
+        likelihood values for two variables (data1 and data2).
+        This method generates a filled contour plot that visualizes
+        the joint probability distribution of the variables.
 
-        :param data1: 1D array of data for the first variable (e.g., A values).
+        :param data1: 1D array of data for the first variable
+        (e.g., A values).
         :type data1: np.ndarray
-        :param data2: 1D array of data for the second variable (e.g., v0 values).
+        :param data2: 1D array of data for the second variable
+        (e.g., v0 values).
         :type data2: np.ndarray
-        :param marginalized_data1_data2: 2D array of marginalized likelihood values
-        for the pair of variables.
+        :param marginalized_data1_data2: 2D array of marginalized
+        likelihood values for the pair of variables.
         :type marginalized_data1_data2: np.ndarray
-        :param xlabel: Label for the x-axis, usually the name of the first variable.
+        :param xlabel: Label for the x-axis, usually the name
+        of the first variable.
         :type xlabel: str
-        :param ylabel: Label for the y-axis, usually the name of the second variable.
+        :param ylabel: Label for the y-axis, usually the name
+        of the second variable.
         :type ylabel: str
         :param title: Title for the contour plot.
         :type title: str
@@ -269,8 +292,9 @@ class Plotter:
         label: str,
     ):
         """
-        Creates and displays a plot for the marginalized probability density function (PDF)
-        of a single variable (data1). This method plots the likelihood values marginalized
+        Creates and displays a plot for the marginalized probability
+        density function (PDF) of a single variable (data1).
+        This method plots the likelihood values marginalized
         over other variables.
 
         :param data1: 1D array of the data for the variable to be plotted
