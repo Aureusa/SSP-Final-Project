@@ -2,10 +2,12 @@ from utils import get_data
 import jax.numpy as jnp
 import numpy as np
 
+from bayesian.bayes import BayesianAnalysis
 from plotting.plotting_utils import Plotter
 from estimator.estimator import MLEGeneralJAX
 from model.model_constructor import ModelConstructor
 from markov_chain_monte_carlo.mc_simulator import MCSimulator
+from markov_chain_monte_carlo.mcmc import MCMC
 from utils import print_mc_results
 
 
@@ -103,8 +105,6 @@ def ex_3(
 
 
 def ex_5():
-    from bayesian.bayes import BayesianAnalysis
-
     likelihood = ModelConstructor().get_not_normalized_log_likelihood()
 
     A = np.linspace(0.880, 17.5, 100)
@@ -172,5 +172,70 @@ def ex_5():
     )
 
 
+def ex_6():
+    constructor = ModelConstructor()
+
+    likelihood = constructor.get_likelihood()
+    multivariate_gaussian = constructor.get_multivariate_gaussian()
+
+    simulator = MCSimulator(freq, signal)
+
+    (var_A, var_v0, var_alpha) = simulator.get_variances()
+
+    mg_kwargs = {"covariance_matrix": 3 * np.diag([var_A, var_v0, var_alpha])}
+
+    initial_sample = np.array(INITIAL_GUESS)
+    data = tuple((freq, signal_noise))
+
+    mcmc = MCMC(likelihood, multivariate_gaussian, **mg_kwargs)
+
+    samples = mcmc.metropolis_hastings(initial_sample, data)
+
+    print("Samples len:", len(samples))
+
+    samples_array = np.vstack(samples)
+
+    def moving_average(a, n=10000):
+        ret = np.cumsum(a, dtype=float)
+        ret[n:] = ret[n:] - ret[:-n]
+        return ret[n - 1 :] / n
+
+    A_vals = samples_array[:, 0]
+    A_mean = A_vals.mean()
+    A_std = A_vals.std()
+
+    v_0_vals = samples_array[:, 1]
+    v_0_mean = v_0_vals.mean()
+    v_0_std = v_0_vals.std()
+
+    alpha_vals = samples_array[:, 2]
+    alpha_mean = alpha_vals.mean()
+    alpha_std = alpha_vals.std()
+
+    plotter = Plotter()
+
+    plotter.plot_estimated_parameter(
+        A_vals,
+        f"MCMC samples of A \n (number of samples = {len(A_vals)})",
+        "Amplitude (A)",
+        A_mean,
+        A_std,
+    )
+    plotter.plot_estimated_parameter(
+        v_0_vals,
+        f"MCMC samples of v0 \n (number of samples = {len(A_vals)})",
+        "v_0",
+        v_0_mean,
+        v_0_std,
+    )
+    plotter.plot_estimated_parameter(
+        alpha_vals,
+        f"MCMC samples of alpha \n (number of samples = {len(A_vals)})",
+        "alpha",
+        alpha_mean,
+        alpha_std,
+    )
+
+
 if __name__ == "__main__":
-    ex_5()
+    ex_6()
