@@ -30,9 +30,11 @@ def process_realization(
     :type realiz: np.ndarray
     :param nu: Frequencies associated with the data
     :type nu: jnp.ndarray
-    :param mle_estimator_params: Parameters for initializing the MLE estimator
+    :param mle_estimator_params: Parameters for initializing
+    the MLE estimator
     :type mle_estimator_params: dict
-    :return: A dictionary containing the estimated parameters and diagnostic information
+    :return: A dictionary containing the estimated parameters
+    and diagnostic information
     :rtype: dict
     """
     # Import inside to avoid issues with multiprocessing
@@ -76,13 +78,15 @@ class MCSimulator:
         realizations_filename: str = "realizations.pkl",
     ):
         """
-        Initializes the MCSimulator instance with frequency and signal data.
+        Initializes the MCSimulator instance with frequency
+        ]and signal data.
 
         :param freq: A list of frequencies
         :type freq: list[float]
         :param signal: A list representing the signal
         :type signal: list[float]
-        :param realizations_filename: Filename for storing or loading realizations, defaults to "realizations.pkl"
+        :param realizations_filename: Filename for storing or
+        loading realizations, defaults to "realizations.pkl"
         :type realizations_filename: str, optional
         """
         self._freq = freq
@@ -93,9 +97,11 @@ class MCSimulator:
 
     def perform_simulation(self, num_cpus: int = 8):
         """
-        Runs a Monte Carlo simulation in parallel to process realizations.
+        Runs a Monte Carlo simulation in parallel to
+        process realizations.
 
-        :param num_cpus: Number of CPU cores to use for parallel processing, defaults to 8
+        :param num_cpus: Number of CPU cores to use for
+        parallel processing, defaults to 8
         :type num_cpus: int, optional
         """
         print("=============== Simulation started ===============")
@@ -162,7 +168,8 @@ class MCSimulator:
         """
         Plots Monte Carlo realizations of the signal.
 
-        :param num_realizations: Number of realizations to plot, defaults to 5
+        :param num_realizations: Number of realizations to plot,
+        defaults to 5
         :type num_realizations: int, optional
         """
         # Get the frequencies
@@ -205,38 +212,91 @@ class MCSimulator:
         self, filename: str = "all_estimates_final.pkl"
     ) -> tuple:
         """
-        Plots the probability density function (PDF) of the estimated parameters.
+        Plots the probability density function (PDF) of the
+        estimated parameters.
 
-        :param filename: The filename containing the estimates, defaults to "all_estimates_final.pkl"
+        :param filename: The filename containing the estimates,
+        defaults to "all_estimates_final.pkl"
         :type filename: str, optional
-        :return: Mean and variance of the parameters A, v_0, and alpha
+        :return: Mean and variance of the parameters A, v_0,
+        and alpha
         :rtype: tuple
+        """
+        plotter = Plotter()
+
+        data, mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha = (
+            self._analyse_data()
+        )
+
+        mean_A, std_A = plotter.plot_estimated_parameter(
+            np.array(data["A"]), "Parameter A", "A vals", mean_A, var_A**0.5
+        )
+        mean_v0, std_v0 = plotter.plot_estimated_parameter(
+            np.array(data["v_0"]),
+            "Parameter v_0",
+            "v_0 vals",
+            mean_v0,
+            var_v0**0.5,
+        )
+        mean_alpha, std_alpha = plotter.plot_estimated_parameter(
+            np.array(data["alpha"]),
+            "Parameter alpha",
+            "alpha vals",
+            mean_alpha,
+            var_alpha**0.5,
+        )
+
+        return mean_A, std_A**2, mean_v0, std_v0**2, mean_alpha, std_alpha**2
+
+    def _analyse_data(
+        self, filename: str
+    ) -> tuple[dict, float, float, float, float, float, float]:
+        """
+        Analyzes data from a specified file,
+        calculating mean and variance for
+        parameters A, v_0, and alpha.
+
+        :param filename: The name of the file
+        containing the data to be analyzed.
+        :type filename: str
+        :return: A tuple containing:
+            - data (dict): The loaded data from the file.
+            - mean_A (float): The mean value of parameter A.
+            - var_A (float): The variance of parameter A.
+            - mean_v0 (float): The mean value of parameter v_0.
+            - var_v0 (float): The variance of parameter v_0.
+            - mean_alpha (float): The mean value of parameter alpha.
+            - var_alpha (float): The variance of parameter alpha.
+        :rtype: tuple[dict, float, float, float, float, float, float]
         """
         filepath = os.path.join(REALIZATIONS_FOLDER, filename)
         with open(filepath, "rb") as file:
             data = pickle.load(file)
 
-        plotter = Plotter()
+        mean_A = np.array(data["A"]).mean()
+        var_A = np.array(data["A"]).std() ** 2
 
-        mean_A, std_A = plotter.plot_estimated_parameter(
-            np.array(data["A"]), "Parameter A", "A vals"
-        )
-        mean_v0, std_v0 = plotter.plot_estimated_parameter(
-            np.array(data["v_0"]), "Parameter v_0", "v_0 vals"
-        )
-        mean_alpha, std_alpha = plotter.plot_estimated_parameter(
-            np.array(data["alpha"]), "Parameter alpha", "alpha vals"
-        )
+        mean_v0 = np.array(data["v_0"]).mean()
+        var_v0 = np.array(data["v_0"]).std() ** 2
 
-        return mean_A, std_A**2, mean_v0, std_v0**2, mean_alpha, std_alpha**2
+        mean_alpha = np.array(data["alpha"]).mean()
+        var_alpha = np.array(data["alpha"]).std() ** 2
+
+        return data, mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha
+
+    def get_variances(self, filename: str = "all_estimates_final.pkl"):
+        (_, _, var_A, _, var_v0, _, var_alpha) = self._analyse_data(filename)
+        return var_A, var_v0, var_alpha
 
     def plot_estimates_duiring_nr_optimization(
         self, filename: str = "estimates_nr_final.pkl"
     ):
         """
-        Plots parameter estimates during Newton-Raphson optimization.
+        Plots parameter estimates during Newton-Raphson
+        optimization.
 
-        :param filename: The filename containing the optimization estimates, defaults to "estimates_nr_final.pkl"
+        :param filename: The filename containing the optimization
+        estimates, defaults to "estimates_nr_final.pkl"
         :type filename: str, optional
         """
         # Retrieve the estimates duiring each optimization run
