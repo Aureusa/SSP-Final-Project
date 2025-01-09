@@ -293,5 +293,5 @@ def ex_6():
     )
 
 
-if __name__ == "__main__":
-    ex_5()
+# if __name__ == "__main__":
+#     ex_5()

@@ -51,19 +51,43 @@ class MLEGeneralJAX:
         self._params_to_estimate: list[str] | None = None
 
     @property
-    def estimates(self):
+    def estimates(self) -> list[float]:
+        """
+        Gets a deep copy of the estimates.
+
+        :return: A deep copy of the current estimates.
+        :rtype: list
+        """
         return deepcopy(self._estimates)
 
     @property
-    def gradient_norms(self):
+    def gradient_norms(self) -> list[float]:
+        """
+        Gets a deep copy of the gradient norms.
+
+        :return: A deep copy of the current gradient norms.
+        :rtype: list
+        """
         return deepcopy(self._gradient_norms)
 
     @property
-    def data(self):
+    def data(self) -> tuple[list]:
+        """
+        Gets the current data.
+
+        :return: The current data.
+        :rtype: tuple[list]
+        """
         return self._data
 
     @data.setter
-    def data(self, data):
+    def data(self, data) -> None:
+        """
+        Sets the data, and resets gradient norms and estimates.
+
+        :param data: The new data to set.
+        :type data: tuple[list]
+        """
         self._gradient_norms = []
         self._estimates = []
         self._data = data
@@ -96,9 +120,7 @@ class MLEGeneralJAX:
 
         while True:
             new_guess_arr: jnp.ndarray = (
-                initial_guess_arr
-                - self._gamma
-                * self._compute_gradient_vector_and_jacobian(initial_guess_arr)
+                initial_guess_arr - self._gamma * self._step(initial_guess_arr)
             )
 
             # Calculating the difference between each guess
@@ -119,7 +141,7 @@ class MLEGeneralJAX:
 
         return result_dict
 
-    def plot_estimates(self):
+    def plot_estimates(self) -> None:
         """
         Plots the estimates as a function of the iterations
         from the data collected during optimization.
@@ -167,6 +189,7 @@ class MLEGeneralJAX:
         of the residuals
         :rtype: tuple[float,float]
         """
+        # Get the measured and the modeled values
         modeled_values = self._model(self._data[0], **estimates)
         measured_values = self._data[1]
 
@@ -207,12 +230,11 @@ class MLEGeneralJAX:
         # Calculates the bin count using Scott's rule
         bin_count = self._get_bin_count(data)
 
-        # Plots the hist and gets the bins
         _, bins, _ = plt.hist(
             data, bins=bin_count, color="blue", edgecolor="black", label="Bins"
         )
 
-        # Generate x values across the histogram range
+        # Generate x values for Gaussian
         x_min, x_max = bins[0], bins[-1]
         x_vals_gauss = np.linspace(x_min, x_max, 1000)
 
@@ -282,7 +304,7 @@ class MLEGeneralJAX:
         )
         return mean, std
 
-    def _plot_validator(self):
+    def _plot_validator(self) -> None:
         """
         Validates whether or not plotting is possible by checking whether or not
         the object has used the `evaluate_the_ML_estimate` with `data_logging=True`
@@ -314,9 +336,7 @@ class MLEGeneralJAX:
         self._estimates.append(guess_arr.tolist())
         self._gradient_norms.append(grad_norm)
 
-    def _compute_gradient_vector_and_jacobian(
-        self, vals: jnp.ndarray
-    ) -> jnp.ndarray:
+    def _step(self, vals: jnp.ndarray) -> jnp.ndarray:
         """
         Computes the gradient vector and multiplies it with the jacobian matrix
         (the Hessian).

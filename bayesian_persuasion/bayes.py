@@ -5,7 +5,7 @@ from multiprocessing import Pool
 
 
 class BayesianAnalysis:
-    def __init__(self, nu: jnp.ndarray, s_n: jnp.ndarray):
+    def __init__(self, nu: jnp.ndarray, s_n: jnp.ndarray) -> None:
         """
         Initializes the BayesianAnalysis class with provided data arrays.
 
@@ -17,7 +17,7 @@ class BayesianAnalysis:
         self._nu = nu
         self._s_n = s_n
 
-    def _compute_log_likelihood_chunk(self, chunk_info):
+    def _compute_log_likelihood_chunk(self, chunk_info: tuple) -> np.ndarray:
         """
         Helper function to compute the log-likelihood for a chunk of the grid.
 
@@ -56,7 +56,7 @@ class BayesianAnalysis:
         v0: np.ndarray,
         alpha: np.ndarray,
         num_chunks: int = 10,
-    ):
+    ) -> tuple:
         """
         Compute the marginalized PDFs for parameters A, v0, and alpha based on the
         model and likelihood function. The grid is divided into chunks and processed

@@ -2,7 +2,7 @@ import numpy as np
 
 
 class MCGenerator:
-    def __init__(self, signal: list[float]):
+    def __init__(self, signal: list[float]) -> None:
         """
         Instantiates an Monty Carlo Generator.
 

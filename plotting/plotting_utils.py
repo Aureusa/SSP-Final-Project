@@ -93,7 +93,7 @@ class Plotter:
         x_labels: str,
         mean: float,
         std: float,
-    ):
+    ) -> None:
         """
         Plots a histogram of the estimated parameter and
         overlays the mean and standard deviation.
@@ -136,12 +136,11 @@ class Plotter:
         # Calculates the bin count using Scott's rule
         bin_count = self._get_bin_count(data)
 
-        # Plots the hist and gets the bins
         _, bins, _ = plt.hist(
             data, bins=bin_count, color="blue", edgecolor="black", label="Bins"
         )
 
-        # Generate x values across the histogram range
+        # Generate x values for Gaussian
         x_min, x_max = bins[0], bins[-1]
         x_vals_gauss = np.linspace(x_min, x_max, 1000)
 
@@ -183,15 +182,17 @@ class Plotter:
         k = round(n ** (1 / 3))
         return int(k)
 
-    def plot_estimates_with_variance(self, estimates: np.ndarray):
+    def plot_estimates_with_variance(self, estimates: np.ndarray) -> None:
         """
         Plots the mean and variance (as a shaded area) of the estimates.
+
+        :param estimate: A 2d array of the stimates with
+            shape = (steps, num_params)
+        :param type: np.ndarray
         """
         # Calculate the mean and standard deviation across runs (axis=0)
-        mean_estimates = np.mean(
-            estimates, axis=0
-        )  # Shape: (steps, num_params)
-        std_estimates = np.std(estimates, axis=0)  # Shape: (steps, num_params)
+        mean_estimates = np.mean(estimates, axis=0)
+        std_estimates = np.std(estimates, axis=0)
 
         # Extract mean and std for each parameter
         mean_A, mean_v_0, mean_alpha = mean_estimates.T
@@ -229,7 +230,6 @@ class Plotter:
             alpha=0.2,
         )
 
-        # Labels and legend
         plt.xlabel("Step")
         plt.ylabel("Value")
         plt.title(
@@ -248,7 +248,7 @@ class Plotter:
         xlabel: str,
         ylabel: str,
         title: str,
-    ):
+    ) -> None:
         """
         Creates and displays a contour plot of the marginalized
         likelihood values for two variables (data1 and data2).

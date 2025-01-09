@@ -36,7 +36,8 @@ class ModelConstructor:
 
         :param parameters: Model parameters (A, v_0, alpha).
         :type parameters: np.ndarray
-        :param data: Tuple containing `v_i` (velocity data) and `s_n` (signal data).
+        :param data: Tuple containing `v_i` (velocity data)
+        and `s_n` (signal data).
         :type data: tuple[np.ndarray, np.ndarray]
         :return: The likelihood value.
         :rtype: float
@@ -124,8 +125,8 @@ class ModelConstructor:
         sigma: float = jnp.sqrt(0.0025),
     ) -> float:
         """
-        Defines the model used to generate data and calculates the negative log-likelihood
-        based on observed data and the model.
+        Defines the model used to generate data and calculates
+        the negative log-likelihood based on observed data and the model.
 
         :param A: Amplitude of the model.
         :type A: float
@@ -137,9 +138,11 @@ class ModelConstructor:
         :type v_i: float
         :param s_n: List of observed data points (signal+noise).
         :type s_n: list[float]
-        :param sigma: Standard deviation of the noise, default is sqrt(0.0025).
+        :param sigma: Standard deviation of the noise,
+        default is sqrt(0.0025).
         :type sigma: float
-        :return: Negative log-likelihood of the model given the observed data.
+        :return: Negative log-likelihood of the model given
+        the observed data.
         :rtype: float
         """
         model = A * (v_i / v_0) ** alpha * (1 + v_i / v_0) ** (-4 * alpha)
@@ -152,11 +155,11 @@ class ModelConstructor:
         alpha: float,
         v_i: float,
         s_n: list[float],
-        sigma: float = jnp.sqrt(0.0025),
+        sigma: float = np.sqrt(0.0025),
     ) -> float:
         """
-        Defines the model used to generate data and calculates the negative log-likelihood
-        based on observed data and the model.
+        Defines the model used to generate data and calculates
+        the negative log-likelihood based on observed data and the model.
 
         :param A: Amplitude of the model.
         :type A: float
@@ -168,10 +171,12 @@ class ModelConstructor:
         :type v_i: float
         :param s_n: List of observed data points (signal+noise).
         :type s_n: list[float]
-        :param sigma: Standard deviation of the noise, default is sqrt(0.0025).
+        :param sigma: Standard deviation of the noise,
+        default is sqrt(0.0025).
         :type sigma: float
-        :return: Negative log-likelihood of the model given the observed data.
+        :return: Negative log-likelihood of the model given
+        the observed data.
         :rtype: float
         """
         model = A * (v_i / v_0) ** alpha * (1 + v_i / v_0) ** (-4 * alpha)
-        return jnp.sum(-((s_n - model) ** 2))
+        return np.sum(-((s_n - model) ** 2) / (2 * sigma**2))

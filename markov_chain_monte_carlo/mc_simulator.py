@@ -22,7 +22,7 @@ multiprocessing.set_start_method("spawn", force=True)
 
 def process_realization(
     realiz: np.ndarray, nu: jnp.ndarray, mle_estimator_params: dict
-):
+) -> dict:
     """
     Processes a single realization in parallel using an MLE estimator.
 
@@ -37,10 +37,10 @@ def process_realization(
     and diagnostic information
     :rtype: dict
     """
-    # Import inside to avoid issues with multiprocessing
+    # Import inside to not get issues with multiprocessing
     from estimator.estimator import MLEGeneralJAX
 
-    # Recreate the MLE estimator in the new process
+    # Reinstantiates MLEGeneralJAX for each CPU
     mle_estimator = MLEGeneralJAX(
         model=mle_estimator_params["model"],
         log_likelihood=mle_estimator_params["log_likelihood"],
@@ -49,11 +49,11 @@ def process_realization(
         gamma=mle_estimator_params["gamma"],
     )
 
-    # Create the data tuple
+    # Preps the data
     realiz = jnp.array(realiz.tolist())
     data = tuple((nu, realiz))
 
-    # Set the data attribute to the data tuple
+    # Set the data of the estimator using the setter
     mle_estimator.data = data
 
     # Perform the estimation
@@ -76,7 +76,7 @@ class MCSimulator:
         freq: list[float],
         signal: list[float],
         realizations_filename: str = "realizations.pkl",
-    ):
+    ) -> None:
         """
         Initializes the MCSimulator instance with frequency
         ]and signal data.
@@ -95,7 +95,7 @@ class MCSimulator:
             REALIZATIONS_FOLDER, realizations_filename
         )
 
-    def perform_simulation(self, num_cpus: int = 8):
+    def perform_simulation(self, num_cpus: int = 8) -> None:
         """
         Runs a Monte Carlo simulation in parallel to
         process realizations.
@@ -143,7 +143,7 @@ class MCSimulator:
                 for realiz in realizations
             ]
 
-            # Collect results
+            # Collect results as the come
             for count, future in enumerate(
                 concurrent.futures.as_completed(futures), 1
             ):
@@ -164,7 +164,7 @@ class MCSimulator:
         # Save everything at the end
         save(all_estimates, estimates, gradient_norms, "ALL")
 
-    def plot_mc_realizations(self, num_realizations: int = 5):
+    def plot_mc_realizations(self, num_realizations: int = 5) -> None:
         """
         Plots Monte Carlo realizations of the signal.
 
@@ -178,13 +178,12 @@ class MCSimulator:
         # Get realizations
         realizations = self._get_realizations()
 
-        # Plot the realizations
         plotter = Plotter()
         plotter.plot_mc_realizations(
             nu, self._signal, realizations, num_realizations
         )
 
-    def _get_realizations(self):
+    def _get_realizations(self) -> np.ndarray:
         """
         Loads or generates Monte Carlo realizations.
 
@@ -199,18 +198,26 @@ class MCSimulator:
             realizations = realizations
         else:
             # Generate realizations if file not found
+            print(
+                f"No such filepath exists: {self._realization_filepath}\n "
+                "Generating realiaztions..."
+            )
             signal_generator = MCGenerator(self._signal)
             realizations = signal_generator.generate_mc_realizations()
 
             new_file = os.path.join(REALIZATIONS_FOLDER, "realizations.pkl")
             with open(new_file, "wb") as file:
                 pickle.dump(realizations, file)
+            print(
+                "Generation complete! The realizations can be found in the following dir:\n",
+                new_file,
+            )
 
         return realizations
 
     def plot_estimates_pdf(
         self, filename: str = "all_estimates_final.pkl"
-    ) -> tuple:
+    ) -> None:
         """
         Plots the probability density function (PDF) of the
         estimated parameters.
@@ -218,35 +225,30 @@ class MCSimulator:
         :param filename: The filename containing the estimates,
         defaults to "all_estimates_final.pkl"
         :type filename: str, optional
-        :return: Mean and variance of the parameters A, v_0,
-        and alpha
-        :rtype: tuple
         """
         plotter = Plotter()
 
         data, mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha = (
-            self._analyse_data()
+            self._analyse_data(filename)
         )
 
-        mean_A, std_A = plotter.plot_estimated_parameter(
+        plotter.plot_estimated_parameter(
             np.array(data["A"]), "Parameter A", "A vals", mean_A, var_A**0.5
         )
-        mean_v0, std_v0 = plotter.plot_estimated_parameter(
+        plotter.plot_estimated_parameter(
             np.array(data["v_0"]),
             "Parameter v_0",
             "v_0 vals",
             mean_v0,
             var_v0**0.5,
         )
-        mean_alpha, std_alpha = plotter.plot_estimated_parameter(
+        plotter.plot_estimated_parameter(
             np.array(data["alpha"]),
             "Parameter alpha",
             "alpha vals",
             mean_alpha,
             var_alpha**0.5,
         )
-
-        return mean_A, std_A**2, mean_v0, std_v0**2, mean_alpha, std_alpha**2
 
     def _analyse_data(
         self, filename: str
@@ -284,7 +286,35 @@ class MCSimulator:
 
         return data, mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha
 
-    def get_variances(self, filename: str = "all_estimates_final.pkl"):
+    def get_means(
+        self, filename: str = "all_estimates_final.pkl"
+    ) -> tuple[float, float, float]:
+        """
+        Computes the means of the parameters (A, v_0, alpha)
+        from the analysis of the data.
+
+        :param filename: The name of the file containing the
+        data to analyze, defaults to "all_estimates_final.pkl".
+        :type filename: str, optional
+        :return: The mean values of A, v_0, and alpha.
+        :rtype: tuple[float,float,float]
+        """
+        (_, mean_A, _, mean_v0, _, mean_alpha, _) = self._analyse_data(
+            filename
+        )
+        return mean_A, mean_v0, mean_alpha
+
+    def get_variances(
+        self, filename: str = "all_estimates_final.pkl"
+    ) -> tuple[float, float, float]:
+        """
+        Computes the variances of the parameters (A, v_0, alpha) from the analysis of the data.
+
+        :param filename: The name of the file containing the data to analyze, defaults to "all_estimates_final.pkl".
+        :type filename: str, optional
+        :return: The variances of A, v_0, and alpha.
+        :rtype: tuple[float,float,float]
+        """
         (_, _, var_A, _, var_v0, _, var_alpha) = self._analyse_data(filename)
         return var_A, var_v0, var_alpha
 
@@ -312,28 +342,28 @@ class MCSimulator:
 
     def _add_padding(self, estimates: list[list[list[float]]]) -> np.ndarray:
         """
-        Adds padding to the 3D list of estimates by extending each inner list to the maximum length
-        with repetitions of its last value. This is done in order to be able to convert this list
-        into a python object and avoid inhomoguneity error.
+        Adds padding to the 3D list of estimates by extending each
+        inner list to the maximum length with repetitions of its last value.
+        This is done in order to be able to convert this list
+        into a numpy object and avoid inhomoguneity error.
 
         :param data: A 3D list of estimates, where each innermost list represents a run of values
         :type data: list[list[list[float]]]
         :return: A 3D NumPy array with all runs padded to the maximum length
         :rtype: np.ndarray
         """
+        # Calculates the length of the longest run
         max_len = max(len(run) for run in estimates)
 
-        # Pad each run by repeating the last value
+        # Pad each shorter run by repeating the last value
         padded_data = []
         for run in estimates:
-            # Calculate how many iterations need to be added
+            # Calculate the padding needed
             padding_needed = max_len - len(run)
 
-            # If padding is needed, repeat the last value
             if padding_needed > 0:
                 run += [run[-1]] * padding_needed
 
-            # Add the padded run to the new list
             padded_data.append(run)
 
         padded_data = np.array(padded_data)
