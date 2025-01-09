@@ -72,7 +72,10 @@ def ex_2():
 
 
 def ex_3(
-    perform_sim: bool = False, num_cpus: int = 8, num_realizations: int = 5
+    perform_sim: bool = False,
+    num_cpus: int = 8,
+    num_realizations: int = 5,
+    folder: str = "results1_last"
 ):
     """
     Exercise 3: Runs a Monte Carlo simulation and visualizes the results.
@@ -97,13 +100,13 @@ def ex_3(
 
     simulator.plot_mc_realizations(num_realizations)
 
-    simulator.plot_estimates_duiring_nr_optimization()
+    simulator.plot_estimates_duiring_nr_optimization(folder)
 
-    simulator.plot_estimates_pdf()
+    simulator.plot_estimates_pdf(folder)
 
-    mean_A, mean_v0, mean_alpha = simulator.get_means()
+    mean_A, mean_v0, mean_alpha = simulator.get_means(folder)
 
-    var_A, var_v0, var_alpha = simulator.get_variances()
+    var_A, var_v0, var_alpha = simulator.get_variances(folder)
 
     print_mc_results(mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha)
 

@@ -216,20 +216,19 @@ class MCSimulator:
         return realizations
 
     def plot_estimates_pdf(
-        self, filename: str = "all_estimates_final.pkl"
+        self, folder
     ) -> None:
         """
         Plots the probability density function (PDF) of the
         estimated parameters.
 
-        :param filename: The filename containing the estimates,
-        defaults to "all_estimates_final.pkl"
+        :param filename: The filename containing the estimates
         :type filename: str, optional
         """
         plotter = Plotter()
 
         data, mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha = (
-            self._analyse_data(filename)
+            self._analyse_data(folder)
         )
 
         plotter.plot_estimated_parameter(
@@ -251,7 +250,7 @@ class MCSimulator:
         )
 
     def _analyse_data(
-        self, filename: str
+        self, folder
     ) -> tuple[dict, float, float, float, float, float, float]:
         """
         Analyzes data from a specified file,
@@ -271,7 +270,8 @@ class MCSimulator:
             - var_alpha (float): The variance of parameter alpha.
         :rtype: tuple[dict, float, float, float, float, float, float]
         """
-        filepath = os.path.join(REALIZATIONS_FOLDER, filename)
+        results_folder = os.path.join(REALIZATIONS_FOLDER, folder)
+        filepath = os.path.join(results_folder, "all_estimates.pkl")
         with open(filepath, "rb") as file:
             data = pickle.load(file)
 
@@ -287,50 +287,53 @@ class MCSimulator:
         return data, mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha
 
     def get_means(
-        self, filename: str = "all_estimates_final.pkl"
+        self, folder
     ) -> tuple[float, float, float]:
         """
         Computes the means of the parameters (A, v_0, alpha)
         from the analysis of the data.
 
-        :param filename: The name of the file containing the
-        data to analyze, defaults to "all_estimates_final.pkl".
+        :param filename: The folder of the results with the
+        data to analyze.
         :type filename: str, optional
         :return: The mean values of A, v_0, and alpha.
         :rtype: tuple[float,float,float]
         """
         (_, mean_A, _, mean_v0, _, mean_alpha, _) = self._analyse_data(
-            filename
+            folder
         )
         return mean_A, mean_v0, mean_alpha
 
     def get_variances(
-        self, filename: str = "all_estimates_final.pkl"
+        self, folder
     ) -> tuple[float, float, float]:
         """
-        Computes the variances of the parameters (A, v_0, alpha) from the analysis of the data.
+        Computes the variances of the parameters (A, v_0, alpha)
+        from the analysis of the data.
 
-        :param filename: The name of the file containing the data to analyze, defaults to "all_estimates_final.pkl".
+        :param filename: The name of the folder containing the
+        data to analyze.
         :type filename: str, optional
         :return: The variances of A, v_0, and alpha.
         :rtype: tuple[float,float,float]
         """
-        (_, _, var_A, _, var_v0, _, var_alpha) = self._analyse_data(filename)
+        (_, _, var_A, _, var_v0, _, var_alpha) = self._analyse_data(folder)
         return var_A, var_v0, var_alpha
 
     def plot_estimates_duiring_nr_optimization(
-        self, filename: str = "estimates_nr_final.pkl"
+        self, folder
     ):
         """
         Plots parameter estimates during Newton-Raphson
         optimization.
 
         :param filename: The filename containing the optimization
-        estimates, defaults to "estimates_nr_final.pkl"
+        estimates
         :type filename: str, optional
         """
         # Retrieve the estimates duiring each optimization run
-        filepath = os.path.join(REALIZATIONS_FOLDER, filename)
+        results_folder = os.path.join(REALIZATIONS_FOLDER, folder)
+        filepath = os.path.join(results_folder, "estimates_nr.pkl")
         with open(filepath, "rb") as file:
             data = pickle.load(file)
 
