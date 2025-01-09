@@ -99,9 +99,11 @@ def ex_3(
 
     simulator.plot_estimates_duiring_nr_optimization()
 
-    (mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha) = (
-        simulator.plot_estimates_pdf()
-    )
+    simulator.plot_estimates_pdf()
+
+    mean_A, mean_v0, mean_alpha = simulator.get_means()
+
+    var_A, var_v0, var_alpha = simulator.get_variances()
 
     print_mc_results(mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha)
 
@@ -121,13 +123,18 @@ def ex_4():
     v0_min, v_max = tuple((0.95, 1.05))
     alpha_min, alpha_max = tuple((0.625, 0.740))
 
+
     A = np.linspace(A_min, A_max, len(freq))
     v0 = np.linspace(v0_min, v_max, len(freq))
     alpha = np.linspace(alpha_min, alpha_max, len(freq))
 
-    parameters = tuple((A, v0, alpha))
+    mean_A, mean_v0, mean_alpha = simulator.get_means()
 
-    data = tuple((np.array(freq), np.array(s_n)))
+    #parameters = tuple((A, v0, alpha))
+
+    parameters = tuple((mean_A, mean_v0, mean_alpha))
+
+    data = np.array(freq)
 
     fisher = estimator.compute_fisher_matrix(params=parameters, data=data)
 
@@ -291,7 +298,4 @@ def ex_6():
         alpha_mean,
         alpha_std,
     )
-
-
-# if __name__ == "__main__":
-#     ex_5()
+      
