@@ -49,6 +49,7 @@ class MLEGeneralJAX:
         self._gradient_norms: list[float] = []
         self._estimates: list[float] = []
         self._params_to_estimate: list[str] | None = None
+        self._results_dict: dict|None = None
 
     @property
     def estimates(self) -> list[float]:
@@ -139,7 +140,36 @@ class MLEGeneralJAX:
         results = new_guess_arr.tolist()
         result_dict = dict(zip(self._params_to_estimate, results))
 
+        self._results_dict = result_dict
+
         return result_dict
+    
+    def plot_fitted_model(self) -> None:
+        """
+        Plots the estimates as a function of the iterations
+        from the data collected during optimization.
+        """
+        self._plot_validator()
+
+        A = self._results_dict["A"]
+        v_0 = self._results_dict["v_0"]
+        alpha = self._results_dict["alpha"]
+
+        v_i = np.linspace(0.05,1,500)
+
+        x_dat, y_dat = self._data
+
+        y_hat = self._model(v_i=v_i, A=A, v_0=v_0, alpha=alpha)
+
+        plt.figure(figsize=(8, 6))
+        plt.plot(v_i, y_hat, label="Fitted Model", color="red")
+        plt.scatter(x_dat, y_dat, label="Data", color="black", marker="*")
+        plt.xlabel("frequency (ν)")
+        plt.ylabel("Amplitude")
+        plt.title("Fitted model with the data points")
+        plt.grid(True)
+        plt.legend()
+        plt.show()
 
     def plot_estimates(self) -> None:
         """

@@ -66,6 +66,7 @@ def ex_2():
 
     mle_estimator.plot_gradient_norms()
     mle_estimator.plot_estimates()
+    mle_estimator.plot_fitted_model()
     mle_estimator.plot_residuals(guess)
 
     print(guess)
@@ -111,7 +112,7 @@ def ex_3(
     print_mc_results(mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha)
 
 
-def ex_4():
+def ex_4(folder: str = "results1_last"):
     """
     Example 4: Computes the Fisher Information Matrix
     and the Cramér-Rao Lower Bound (CRLB) for a given set of parameters and data.
@@ -131,7 +132,7 @@ def ex_4():
     v0 = np.linspace(v0_min, v_max, len(freq))
     alpha = np.linspace(alpha_min, alpha_max, len(freq))
 
-    mean_A, mean_v0, mean_alpha = simulator.get_means()
+    mean_A, mean_v0, mean_alpha = simulator.get_means(folder)
 
     #parameters = tuple((A, v0, alpha))
 
@@ -147,7 +148,7 @@ def ex_4():
 
     print("CRLB", crlb)
 
-    var_A, var_v0, var_alpha = simulator.get_variances()
+    var_A, var_v0, var_alpha = simulator.get_variances(folder)
 
     calculated = np.array([var_A, var_v0, var_alpha])
 
@@ -232,7 +233,7 @@ def ex_5():
     )
 
 
-def ex_6():
+def ex_6(folder: str = "results1_last"):
     """
     Example 6: Uses the Metropolis-Hastings algorithm to
     perform Markov Chain Monte Carlo (MCMC) sampling for estimating the
@@ -246,7 +247,7 @@ def ex_6():
 
     simulator = MCSimulator(freq, signal)
 
-    (var_A, var_v0, var_alpha) = simulator.get_variances()
+    (var_A, var_v0, var_alpha) = simulator.get_variances(folder)
 
     mg_kwargs = {"covariance_matrix": 3 * np.diag([var_A, var_v0, var_alpha])}
 
@@ -260,11 +261,6 @@ def ex_6():
     print("Samples len:", len(samples))
 
     samples_array = np.vstack(samples)
-
-    def moving_average(a, n=10000):
-        ret = np.cumsum(a, dtype=float)
-        ret[n:] = ret[n:] - ret[:-n]
-        return ret[n - 1 :] / n
 
     A_vals = samples_array[:, 0]
     A_mean = A_vals.mean()
@@ -282,21 +278,21 @@ def ex_6():
 
     plotter.plot_estimated_parameter(
         A_vals,
-        f"MCMC samples of A \n (number of samples = {len(A_vals)})",
+        "MCMC samples of A \n",
         "Amplitude (A)",
         A_mean,
         A_std,
     )
     plotter.plot_estimated_parameter(
         v_0_vals,
-        f"MCMC samples of v0 \n (number of samples = {len(A_vals)})",
+        "MCMC samples of v0 \n",
         "v_0",
         v_0_mean,
         v_0_std,
     )
     plotter.plot_estimated_parameter(
         alpha_vals,
-        f"MCMC samples of alpha \n (number of samples = {len(A_vals)})",
+        "MCMC samples of alpha \n",
         "alpha",
         alpha_mean,
         alpha_std,
