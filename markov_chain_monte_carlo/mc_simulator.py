@@ -215,9 +215,7 @@ class MCSimulator:
 
         return realizations
 
-    def plot_estimates_pdf(
-        self, folder
-    ) -> None:
+    def plot_estimates_pdf(self, folder) -> None:
         """
         Plots the probability density function (PDF) of the
         estimated parameters.
@@ -286,9 +284,7 @@ class MCSimulator:
 
         return data, mean_A, var_A, mean_v0, var_v0, mean_alpha, var_alpha
 
-    def get_means(
-        self, folder
-    ) -> tuple[float, float, float]:
+    def get_means(self, folder) -> tuple[float, float, float]:
         """
         Computes the means of the parameters (A, v_0, alpha)
         from the analysis of the data.
@@ -299,14 +295,10 @@ class MCSimulator:
         :return: The mean values of A, v_0, and alpha.
         :rtype: tuple[float,float,float]
         """
-        (_, mean_A, _, mean_v0, _, mean_alpha, _) = self._analyse_data(
-            folder
-        )
+        (_, mean_A, _, mean_v0, _, mean_alpha, _) = self._analyse_data(folder)
         return mean_A, mean_v0, mean_alpha
 
-    def get_variances(
-        self, folder
-    ) -> tuple[float, float, float]:
+    def get_variances(self, folder) -> tuple[float, float, float]:
         """
         Computes the variances of the parameters (A, v_0, alpha)
         from the analysis of the data.
@@ -320,9 +312,7 @@ class MCSimulator:
         (_, _, var_A, _, var_v0, _, var_alpha) = self._analyse_data(folder)
         return var_A, var_v0, var_alpha
 
-    def plot_estimates_duiring_nr_optimization(
-        self, folder
-    ):
+    def plot_estimates_duiring_nr_optimization(self, folder):
         """
         Plots parameter estimates during Newton-Raphson
         optimization.

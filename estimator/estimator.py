@@ -49,7 +49,7 @@ class MLEGeneralJAX:
         self._gradient_norms: list[float] = []
         self._estimates: list[float] = []
         self._params_to_estimate: list[str] | None = None
-        self._results_dict: dict|None = None
+        self._results_dict: dict | None = None
 
     @property
     def estimates(self) -> list[float]:
@@ -143,7 +143,7 @@ class MLEGeneralJAX:
         self._results_dict = result_dict
 
         return result_dict
-    
+
     def plot_fitted_model(self) -> None:
         """
         Plots the estimates as a function of the iterations
@@ -155,7 +155,7 @@ class MLEGeneralJAX:
         v_0 = self._results_dict["v_0"]
         alpha = self._results_dict["alpha"]
 
-        v_i = np.linspace(0.05,1,500)
+        v_i = np.linspace(0.05, 1, 500)
 
         x_dat, y_dat = self._data
 

@@ -9,7 +9,6 @@ from model.model_constructor import ModelConstructor
 from markov_chain_monte_carlo.mc_simulator import MCSimulator
 from markov_chain_monte_carlo.mcmc import MCMC
 from utils import print_mc_results
-
 from estimator.crlb_estimator import CRLBEstimator
 
 
@@ -76,7 +75,7 @@ def ex_3(
     perform_sim: bool = False,
     num_cpus: int = 8,
     num_realizations: int = 5,
-    folder: str = "results1_last"
+    folder: str = "results1_last",
 ):
     """
     Exercise 3: Runs a Monte Carlo simulation and visualizes the results.
@@ -123,18 +122,7 @@ def ex_4(folder: str = "results1_last"):
 
     simulator = MCSimulator(freq, signal)
 
-    A_min, A_max = tuple((4, 5))
-    v0_min, v_max = tuple((0.95, 1.05))
-    alpha_min, alpha_max = tuple((0.625, 0.740))
-
-
-    A = np.linspace(A_min, A_max, len(freq))
-    v0 = np.linspace(v0_min, v_max, len(freq))
-    alpha = np.linspace(alpha_min, alpha_max, len(freq))
-
     mean_A, mean_v0, mean_alpha = simulator.get_means(folder)
-
-    #parameters = tuple((A, v0, alpha))
 
     parameters = tuple((mean_A, mean_v0, mean_alpha))
 
@@ -297,4 +285,3 @@ def ex_6(folder: str = "results1_last"):
         alpha_mean,
         alpha_std,
     )
-      
