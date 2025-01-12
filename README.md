@@ -43,6 +43,10 @@ To run the project, execute the `main.py` file:
 python main.py
 ```
 
+## Contribution
+
+This repository has been archived and is no longer actively maintained. As such, contributions, bug fixes, and feature requests are not being accepted at this time. The repository is preserved for historical purposes and reference.
+
 ## License
 
 This project is licensed under the "All Rights Reserved" license. You may not copy, modify, distribute, or use any part of this project for any purposes without explicit permission from the author.
